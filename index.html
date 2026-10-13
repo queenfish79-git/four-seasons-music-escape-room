@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f4ef">
+  <title>四季音樂密室逃脫｜遊戲與研究架構</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #24313c;
+      --muted: #5d6a72;
+      --paper: #f5f4ef;
+      --surface: #fffefa;
+      --line: #d8dedb;
+      --blue: #dcebf1;
+      --blue-ink: #214c5b;
+      --lavender: #eee8f5;
+      --lavender-ink: #55416c;
+      --green: #e5efe4;
+      --green-ink: #36543a;
+      --gold: #f5ecd5;
+      --gold-ink: #71551e;
+      --rose: #f4e5e1;
+      --rose-ink: #75463f;
+      --shadow: 0 10px 30px rgb(35 49 60 / 7%);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Segoe UI", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+      line-height: 1.65;
+    }
+    main { width: min(1120px, calc(100% - 40px)); margin: 0 auto; padding: 48px 0 64px; }
+    header { max-width: 850px; margin: 0 auto 30px; text-align: center; }
+    .eyebrow { margin: 0 0 8px; color: var(--blue-ink); font-size: .83rem; font-weight: 700; letter-spacing: .12em; }
+    h1 { margin: 0; font-size: clamp(1.8rem, 4vw, 3rem); line-height: 1.2; letter-spacing: -.03em; }
+    .intro { max-width: 760px; margin: 16px auto 0; color: var(--muted); font-size: 1.05rem; }
+    .scope { display: inline-flex; gap: 8px; align-items: center; margin-top: 18px; padding: 7px 13px; border: 1px solid #d8d1bd; border-radius: 999px; background: #fbf7eb; color: #665327; font-size: .88rem; }
+    .scope strong { color: #493b1d; }
+    section { margin-top: 34px; }
+    h2 { margin: 0 0 14px; font-size: 1.35rem; letter-spacing: -.01em; }
+    h3 { margin: 0 0 7px; font-size: 1.03rem; }
+    p { margin: 0; }
+    .overview { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .overview-item, .panel, .step, .research-step { background: var(--surface); box-shadow: var(--shadow); }
+    .overview-item { padding: 19px 20px; border-top: 4px solid #9bb8c3; border-radius: 12px; }
+    .overview-item:nth-child(2) { border-top-color: #a99aba; }
+    .overview-item:nth-child(3) { border-top-color: #bca467; }
+    .overview-item p, .panel p, .step p, .research-step p { color: var(--muted); }
+    .overview-item p { font-size: .94rem; }
+    .section-note { margin: -5px 0 14px; color: var(--muted); }
+    .flow { display: flex; align-items: stretch; gap: 8px; }
+    .step { position: relative; flex: 1 1 0; min-width: 120px; padding: 15px 14px; border: 1px solid var(--line); border-radius: 12px; }
+    .step:not(:last-child)::after { content: "→"; position: absolute; z-index: 2; top: 50%; right: -15px; transform: translateY(-50%); color: #75858a; font-size: 1.25rem; font-weight: 700; }
+    .step-no { display: grid; width: 27px; height: 27px; margin-bottom: 10px; place-items: center; border-radius: 50%; background: var(--blue); color: var(--blue-ink); font-size: .82rem; font-weight: 700; }
+    .step h3 { font-size: .97rem; }
+    .step p { font-size: .86rem; }
+    .optional { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start; width: min(690px, 100%); margin: 16px auto 0; padding: 14px 17px; border: 1px dashed #bca467; border-radius: 12px; background: #fbf7eb; }
+    .optional-label { padding: 3px 8px; border-radius: 6px; background: var(--gold); color: var(--gold-ink); font-size: .8rem; font-weight: 700; white-space: nowrap; }
+    .optional p { color: #625737; font-size: .92rem; }
+    .columns { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .panel { padding: 21px; border: 1px solid var(--line); border-radius: 14px; }
+    .panel.blue { background: linear-gradient(135deg, #f8fcfd, var(--blue)); }
+    .panel.lavender { background: linear-gradient(135deg, #fcfaff, var(--lavender)); }
+    .panel.green { background: linear-gradient(135deg, #fbfdf9, var(--green)); }
+    .panel.gold { background: linear-gradient(135deg, #fffdf7, var(--gold)); }
+    .tag { display: inline-block; margin-bottom: 9px; color: var(--blue-ink); font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .lavender .tag { color: var(--lavender-ink); }
+    .green .tag { color: var(--green-ink); }
+    .gold .tag { color: var(--gold-ink); }
+    ul { margin: 10px 0 0; padding-left: 1.2rem; }
+    li { margin: 5px 0; }
+    .panel li { color: #43515a; }
+    .boundary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 13px; }
+    .boundary-item { padding: 14px; border-left: 3px solid #7fa184; background: rgb(255 255 255 / 68%); }
+    .boundary-item:nth-child(2) { border-left-color: #baa056; }
+    .boundary-item:nth-child(3) { border-left-color: #a98e72; }
+    .boundary-item strong { display: block; margin-bottom: 4px; }
+    .boundary-item p { font-size: .9rem; }
+    .research-flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; counter-reset: study; }
+    .research-step { position: relative; min-height: 142px; padding: 17px 16px; border: 1px solid var(--line); border-radius: 12px; counter-increment: study; }
+    .research-step::before { content: "0" counter(study); display: block; margin-bottom: 10px; color: #647f67; font-size: .82rem; font-weight: 700; }
+    .research-step:not(:last-child)::after { content: "→"; position: absolute; top: 48%; right: -13px; z-index: 2; color: #75858a; font-size: 1.2rem; font-weight: 700; }
+    .research-step p { font-size: .88rem; }
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+    .compare > div { padding: 13px 15px; border-radius: 10px; background: #f4f1f7; }
+    .compare > div:last-child { background: #edf2f5; }
+    .compare strong { display: block; margin-bottom: 3px; color: var(--lavender-ink); }
+    .compare p { color: var(--muted); font-size: .9rem; }
+    .guardrails { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .guardrail { padding: 14px 15px; border-top: 3px solid #c39b91; border-radius: 8px; background: var(--surface); }
+    .guardrail strong { display: block; margin-bottom: 4px; }
+    .guardrail p { color: var(--muted); font-size: .88rem; }
+    footer { margin-top: 34px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: .85rem; text-align: center; }
+    @media (max-width: 850px) {
+      main { width: min(100% - 28px, 700px); padding-top: 32px; }
+      .overview, .boundary, .guardrails { grid-template-columns: 1fr 1fr; }
+      .flow { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+      .step:not(:last-child)::after { content: none; }
+      .research-flow { grid-template-columns: repeat(2, 1fr); }
+      .research-step:nth-child(2)::after { content: none; }
+    }
+    @media (max-width: 560px) {
+      main { width: calc(100% - 24px); padding: 26px 0 42px; }
+      header { margin-bottom: 22px; }
+      .overview, .columns, .boundary, .compare, .guardrails { grid-template-columns: 1fr; }
+      .flow, .research-flow { grid-template-columns: 1fr; }
+      .step, .research-step { min-width: 0; min-height: 0; }
+      .research-step:not(:last-child)::after { content: "↓"; top: auto; right: 15px; bottom: -17px; }
+      .research-step:nth-child(2)::after { content: "↓"; }
+      .optional { grid-template-columns: 1fr; gap: 7px; }
+      .optional-label { width: fit-content; }
+      .scope { align-items: flex-start; border-radius: 12px; }
+    }
+    @media print {
+      body { background: white; }
+      main { width: 100%; padding: 0; }
+      .overview-item, .panel, .step, .research-step { box-shadow: none; break-inside: avoid; }
+      section { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <p class="eyebrow">高中音樂 × 探索解謎 × SEL</p>
+      <h1>四季音樂密室逃脫</h1>
+      <p class="intro">學生從維瓦第《四季》的聲音與樂譜中尋找線索，完成音樂任務、取得鑰匙，最後開啟公爵的音樂盒。AI 公爵以提示陪伴探索；感受可以不同，也可以選擇不分享。</p>
+      <div class="scope"><strong>原型範圍</strong><span>先完成《冬》三個樂章，再評估是否擴展到四季十二關</span></div>
+    </header>
+
+    <section aria-labelledby="overview-title">
+      <h2 id="overview-title">整體架構</h2>
+      <div class="overview">
+        <article class="overview-item"><h3>教學素材</h3><p>短音訊、局部樂譜與教師核對的樂器、奏法、術語和答案。</p></article>
+        <article class="overview-item"><h3>遊戲體驗</h3><p>探索 → 聆聽 → 找證據 → 整理線索 → 解鎖，完成後開啟音樂盒。</p></article>
+        <article class="overview-item"><h3>研究驗證</h3><p>比較適應性 AI 引導與固定腳本，觀察音樂學習成果與互動歷程。</p></article>
+      </div>
+    </section>
+
+    <section aria-labelledby="game-title">
+      <h2 id="game-title">一關怎麼進行</h2>
+      <p class="section-note">每一關都讓學生從可聽、可看的音樂線索提出判斷；只靠情境圖片猜答案並不足以通關。</p>
+      <div class="flow" aria-label="遊戲關卡流程">
+        <article class="step"><span class="step-no">1</span><h3>探索展室</h3><p>尋找局部樂譜、樂手留言或聲音線索。</p></article>
+        <article class="step"><span class="step-no">2</span><h3>聆聽片段</h3><p>重聽、看演奏畫面，或依需要暫停。</p></article>
+        <article class="step"><span class="step-no">3</span><h3>解讀音樂</h3><p>辨認聲部、奏法、強弱或音型變化。</p></article>
+        <article class="step"><span class="step-no">4</span><h3>提出證據</h3><p>指出支持答案的聲音或樂譜線索。</p></article>
+        <article class="step"><span class="step-no">5</span><h3>整理筆記</h3><p>把片段、樂器、特徵與情境連起來。</p></article>
+        <article class="step"><span class="step-no">6</span><h3>取得鑰匙</h3><p>完成音樂知識任務，解鎖道具或鑰匙。</p></article>
+        <article class="step"><span class="step-no">7</span><h3>開啟音樂盒</h3><p>收齊本季線索，解開最終鎖。</p></article>
+      </div>
+      <div class="optional"><span class="optional-label">可選擇，不影響通關</span><p><strong>感受反思：</strong>學生可以描述自己的聆聽感受，也可以不分享私人感受，改談作品或虛構角色；重聽、換段或暫停都由學生決定。</p></div>
+    </section>
+
+    <section aria-labelledby="prototype-title">
+      <h2 id="prototype-title">首版原型：《冬》的三道鎖</h2>
+      <div class="columns">
+        <article class="panel blue"><span class="tag">第一樂章</span><h3>辨識聲音</h3><p>聽短片段、看局部樂譜，從有限選項辨認音樂特徵，並點出證據。</p><ul><li>提示階梯：重聽 → 標出聲部 → 解釋術語 → 示範一題</li><li>避免只憑冰雪畫面猜答案</li></ul></article>
+        <article class="panel lavender"><span class="tag">第二樂章</span><h3>雨滴鑰匙</h3><p>比較小提琴旋律與撥弦伴奏，將 pizzicato 和「撥弦」連到聽見的聲音。</p><ul><li>知識任務完成後取得鑰匙或碎片</li><li>對音樂感受的提問自願回答</li></ul></article>
+        <article class="panel gold"><span class="tag">第三樂章</span><h3>事件排序</h3><p>根據音訊、故事提示與局部樂譜排列冰上事件，並說明所選片段的依據。</p><ul><li>題目不能只靠故事聯想作答</li><li>完成後取得冬之鑰，開啟原型音樂盒</li></ul></article>
+        <article class="panel green"><span class="tag">素材準備</span><h3>先核對再製作</h3><p>所有音樂任務都依選定錄音與樂譜版本標註，讓題目與答案能被教師檢查。</p><ul><li>確認片段起訖、小節與聲部</li><li>核實術語、奏法與標準答案</li></ul></article>
+      </div>
+    </section>
+
+    <section aria-labelledby="duke-title">
+      <h2 id="duke-title">AI 公爵做什麼</h2>
+      <div class="columns">
+        <article class="panel lavender"><span class="tag">角色</span><h3>溫柔、好奇的藝術引導者</h3><p>Medici 公爵是受藝術贊助形象啟發的虛構角色，不是歷史人物的真實重現。故事從「希望大家感受一樣」走向「理解每個人聽見的不同」。</p></article>
+        <article class="panel blue"><span class="tag">互動</span><h3>依需要給提示，不直接代答</h3><ul><li>說明任務和下一步</li><li>根據回答選擇提示層級</li><li>把注意力帶回聲音與樂譜證據</li><li>提供重聽、換線索、暫停等選擇</li></ul></article>
+      </div>
+    </section>
+
+    <section aria-labelledby="measure-title">
+      <h2 id="measure-title">學什麼、怎麼記錄</h2>
+      <div class="boundary">
+        <article class="boundary-item"><strong>音樂知識與聽辨</strong><p>如樂器、術語、奏法與變化；有經教師核實的答案。</p></article>
+        <article class="boundary-item"><strong>個人感受</strong><p>如愉悅、活躍或情緒詞；由學生自評，不設標準答案。</p></article>
+        <article class="boundary-item"><strong>學習歷程</strong><p>如提示層級、重聽次數與作答；用來理解遊戲如何進行。</p></article>
+      </div>
+      <div class="optional"><span class="optional-label">重要區分</span><p>「作品描寫的情境」、「音樂表現的情緒」和「我自己的感受」分開記錄。短期遊戲不能直接證明長期幸福感提升，也不把活動稱為治療。</p></div>
+    </section>
+
+    <section aria-labelledby="research-title">
+      <h2 id="research-title">研究設計：先比較一件事</h2>
+      <p class="section-note">首輪聚焦「依學生回答調整的提示，是否幫助學生運用音樂證據並表達聆聽感受？」</p>
+      <div class="compare">
+        <div><strong>適應性 AI 公爵組</strong><p>依學生回答追問，並選擇合適的提示層級。</p></div>
+        <div><strong>固定腳本公爵組</strong><p>使用預先設定的問題與提示。</p></div>
+      </div>
+      <div class="research-flow" style="margin-top:12px" aria-label="研究流程">
+        <article class="research-step"><h3>保持條件相同</h3><p>故事、曲目、音訊、謎題與概念圖一致；互動時間與提示量盡量相近並記錄。</p></article>
+        <article class="research-step"><h3>提供不同引導</h3><p>一組採適應性提示，另一組採固定腳本。</p></article>
+        <article class="research-step"><h3>無提示後測</h3><p>正式後測時，兩組都不使用公爵提示。</p></article>
+        <article class="research-step"><h3>比較與解讀</h3><p>主要候選成果是音樂證據運用；感受表達與互動歷程可作次要或探索性分析。</p></article>
+      </div>
+    </section>
+
+    <section aria-labelledby="guard-title">
+      <h2 id="guard-title">設計界線</h2>
+      <div class="guardrails">
+        <article class="guardrail"><strong>感受不判對錯</strong><p>不要求正向情緒才能取得鑰匙。</p></article>
+        <article class="guardrail"><strong>不強迫揭露</strong><p>學生可以跳過私人感受反思。</p></article>
+        <article class="guardrail"><strong>資料從簡</strong><p>清楚告知研究蒐集內容與留存方式。</p></article>
+        <article class="guardrail"><strong>效果待驗證</strong><p>小規模試玩用於修正原型，不當作確定的因果證據。</p></article>
+      </div>
+    </section>
+
+    <footer>架構依據《四季音樂密室逃脫：AI 公爵、SEL 與研究設計》構想整理｜尚待確認課堂時數、版本、片段、平台與研究樣本</footer>
+  </main>
+</body>
+</html>
